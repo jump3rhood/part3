@@ -36,8 +36,13 @@ app.get('/api/persons', (request, response) => {
 
 app.post('/api/persons', (request, response)=> {
     const person = request.body;
+    console.log(person);
     if(!person.name || !person.number){
         return response.status(400).json({error: 'name and/or number missing'})
+    }
+    const duplicate = persons.find( p => p.name.toLowerCase() === person.name.toLowerCase())
+    if(duplicate){
+        return response.status(400).json({error: 'name must be unique'})
     }
     person.id = generateId();
     persons = persons.concat(person);
