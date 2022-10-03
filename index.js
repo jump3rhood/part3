@@ -34,6 +34,16 @@ app.get('/api/persons', (request, response) => {
     response.status(200).json(persons);
 })
 
+app.post('/api/persons', (request, response)=> {
+    const person = request.body;
+    if(!person.name || !person.number){
+        return response.status(400).json({error: 'name and/or number missing'})
+    }
+    person.id = generateId();
+    persons = persons.concat(person);
+    response.status(200).json(person);
+})
+
 app.get('/api/persons/:id', (request, response)=> {
     const id = Number(request.params.id);
     const person = persons.find(p=> p.id === id);
@@ -47,7 +57,9 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(p => p.id !== id);
     response.status(204).end();
 })
-
+const generateId = () => {
+    return Math.floor(Math.random()*1000+1);
+}
 const PORT = process.env.PORT || 3001;
 app.listen(PORT)
 console.log(`listening on port ${PORT}`);
