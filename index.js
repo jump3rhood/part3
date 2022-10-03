@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json()); // to parse json sent in the request
 
-const persons = [
+let persons = [
     { 
         "id": 1,
         "name": "Arto Hellas", 
@@ -41,6 +41,11 @@ app.get('/api/persons/:id', (request, response)=> {
         return response.status(200).json(person);
     }
     return response.status(404).end();
+})
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+    persons = persons.filter(p => p.id !== id);
+    response.status(204).end();
 })
 
 const PORT = process.env.PORT || 3001;
