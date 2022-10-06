@@ -1,8 +1,10 @@
 const express = require('express');
+const morgan = require('morgan')
 const app = express();
 
-app.use(express.json()); // to parse json sent in the request
 
+app.use(express.json()); // to parse json sent in the request
+app.use(morgan('tiny'));
 let persons = [
     { 
         "id": 1,
