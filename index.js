@@ -2,9 +2,13 @@ const express = require('express');
 const morgan = require('morgan')
 const app = express();
 
+const logger = morgan(':method :url :status :res[content-length] - :response-time ms :body');
 
 app.use(express.json()); // to parse json sent in the request
-app.use(morgan('tiny'));
+app.use(logger);    // logger
+morgan.token('body', (req) => {
+    return JSON.stringify(req.body);
+})
 let persons = [
     { 
         "id": 1,
@@ -38,7 +42,7 @@ app.get('/api/persons', (request, response) => {
 
 app.post('/api/persons', (request, response)=> {
     const person = request.body;
-    console.log(person);
+    // console.log(person);
     if(!person.name || !person.number){
         return response.status(400).json({error: 'name and/or number missing'})
     }
