@@ -1,9 +1,10 @@
 const express = require('express');
 const morgan = require('morgan')
+const cors = require('cors');
 const app = express();
-
 const logger = morgan(':method :url :status :res[content-length] - :response-time ms :body');
-
+// allow cors
+app.use(cors());
 app.use(express.json()); // to parse json sent in the request
 app.use(logger);    // logger
 morgan.token('body', (req) => {
