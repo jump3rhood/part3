@@ -51,12 +51,10 @@ app.post('/api/persons', (request, response)=> {
     if(!person.name || !person.number){
         return response.status(400).json({error: 'name and/or number missing'})
     }
-    const duplicate = persons.find( p => p.name.toLowerCase() === person.name.toLowerCase())
-    if(duplicate){
-        return response.status(400).json({error: 'name must be unique'})
-    }
-    persons = persons.concat(person)
-    response.status(200).json(person);
+    const newPerson = new Person(person);
+    newPerson.save().then(person => {
+        response.status(200).json(person);
+    }).catch(err => response.status(400).json({error: err.message}))
 })
 
 app.get('/api/persons/:id', (request, response)=> {
