@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan')
 const cors = require('cors');
 const app = express();
+const Person = require('./models/person')
 const logger = morgan(':method :url :status :res[content-length] - :response-time ms :body');
 // allow cors
 app.use(cors());
@@ -39,12 +41,13 @@ app.get('/info', (request, response)=> {
         ${date.toString()}`)
 })
 app.get('/api/persons', (request, response) => {
-    response.status(200).json(persons);
+    Person.find({}).then(persons => {
+        response.status(200).json(persons);
+    })
 })
 
 app.post('/api/persons', (request, response)=> {
     const person = request.body;
-    // console.log(person);
     if(!person.name || !person.number){
         return response.status(400).json({error: 'name and/or number missing'})
     }
@@ -52,18 +55,14 @@ app.post('/api/persons', (request, response)=> {
     if(duplicate){
         return response.status(400).json({error: 'name must be unique'})
     }
-    person.id = generateId();
-    persons = persons.concat(person);
+    persons = persons.concat(person)
     response.status(200).json(person);
 })
 
 app.get('/api/persons/:id', (request, response)=> {
-    const id = Number(request.params.id);
-    const person = persons.find(p=> p.id === id);
-    if(person){
-        return response.status(200).json(person);
-    }
-    return response.status(404).end();
+    Person.findById(request.params.id).then(person => {
+        response.status(200).json(person);
+    }).catch(err => response.status(404).end())
 })
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id);
