@@ -14,10 +14,14 @@ morgan.token('body', (req) => {
     return JSON.stringify(req.body);
 })
 
-app.get('/info', (request, response)=> {
+app.get('/info', (request, response, next)=> {
     const date = new Date();
-    response.send(`Phonebook has info for people
+    Person.find({})
+    .then(persons => {
+        response.status(200).send(`Phonebook has info of ${persons.length} people
         ${date.toString()}`)
+    }).catch(error => next(error))
+   
 })
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
