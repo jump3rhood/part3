@@ -33,8 +33,8 @@ app.post('/api/persons', (request, response)=> {
     const newPerson = new Person(person);
     newPerson.save().then(person => {
         response.status(200).json(person);
-    }).catch(err => {
-        response.status(400).json({error: err.message})
+    }).catch(error => {
+        next(error);
     })
 })
 
@@ -45,9 +45,8 @@ app.get('/api/persons/:id', (request, response)=> {
                 response.status(200).json(person);
             else 
                 response.status(400).end()
-    }).catch(err => {
-        console.log(error)
-        response.status(400).send({ error: 'malformatted id' })
+    }).catch(error => {
+        next(error)
     })
 })
 app.delete('/api/persons/:id', (request, response) => {
@@ -57,13 +56,23 @@ app.delete('/api/persons/:id', (request, response) => {
             console.log(result);
             response.status(202).end();
         }).catch(error => {
-            console.log(error);
-            response.status(500).end();
+            next(error);
         })
 })
 const generateId = () => {
     return Math.floor(Math.random()*1000+1);
 }
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+    
+    if(error.name === "CastError") {
+        return response.status(400).send({error: 'malformatted id'});
+    }
+
+    next(error);
+}
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT)
 console.log(`listening on port ${PORT}`);
