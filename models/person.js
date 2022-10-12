@@ -13,7 +13,7 @@ mongoose.connect(url).then(result => {
 
 const personSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
         minLength: 3,
         required: true
     },
