@@ -57,9 +57,12 @@ app.put('/api/persons/:id', (request,response, next) => {
     const id = request.params.id;
     const body = request.body;
    
-    Person.findByIdAndUpdate(id, body, {new: true})
+    Person.findByIdAndUpdate(id, body, {new: true, runValidators: true})
     .then(updatedPerson => {
-        response.json(updatedPerson);
+        if(updatedPerson)
+            response.status(200).json(updatedPerson);
+        else 
+            response.status(404).json({error: 'Resource with id already deleted or not found'})
     }).catch(error => next(error));
 })
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -81,7 +84,8 @@ const errorHandler = (error, request, response, next) => {
     if(error.name === "CastError") {
         return response.status(400).send({error: 'malformatted id'});
     }
-
+    if(error.name === "ValidationError")
+        return response.status(400).send({error: error.message})
     next(error);
 }
 app.use(errorHandler);
