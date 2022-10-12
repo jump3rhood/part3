@@ -34,11 +34,18 @@ app.post('/api/persons', (request, response, next)=> {
     if(!person.name || !person.number){
         return response.status(400).json({error: 'name and/or number missing'})
     }
-    const newPerson = new Person(person);
-    newPerson.save().then(person => {
-        response.status(200).json(person);
-    }).catch(error => {
-        next(error);
+    Person.find({name: person.name}).then(foundPerson => {
+        if(foundPerson){
+            response.status(400).json({error: 'Name already in phonebook'});
+            return;
+        } else {
+            const newPerson = new Person(person);
+            newPerson.save().then(person => {
+                response.status(200).json(person);
+            }).catch(error => {
+                next(error);
+            })
+        }
     })
 })
 
